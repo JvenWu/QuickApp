@@ -1,0 +1,147 @@
+/**
+ * Shared file between builds so that they can all use the same dependencies and
+ * maven repositories.
+ **/
+def android_ver = [:]
+android_ver.compileSdkVersion = 28
+android_ver.buildToolsVersion = "28.0.3"
+android_ver.minSdkVersion = 19
+android_ver.targetSdkVersion = 28
+android_ver.versionCode = 1000
+android_ver.versionName = "1.0.0"
+ext.android_ver = android_ver
+
+def versions = [:]
+versions.support = "28.0.0"
+versions.retrofit = "2.4.0"
+versions.dagger2 = "2.19"
+versions.glide = "4.8.0"
+//versions.butterknife = "8.8.1"
+versions.butterknife = "10.0.0"
+versions.rxlifecycle = "1.0"
+versions.rxlifecycle2 = "2.2.2"
+versions.espresso = "3.0.1"
+versions.canary = "1.5.4"
+versions.constraint = "1.1.2"
+versions.junit = "4.12"
+versions.android_gradle_plugin = "3.0.0"
+versions.arouter_version = "1.2.4"
+versions.arouter_processor_version = "1.1.4"
+versions.okhttp = "3.9.0"
+versions.logutils_version = "1.5.1.1"
+versions.annotation_api = "1.2"
+versions.lombok = "1.16.6"
+versions.jpush = "3.1.6"
+versions.jcore = "1.2.5"
+versions.dom4j = "1.6.1"
+versions.fastjson = "1.1.68.android"
+versions.multidex = "1.0.3"
+versions.okhttputils = "2.6.2"
+versions.autolayout = "1.4.5"
+versions.gson = "2.8.1"
+versions.androidsvg = "1.2.2-beta-1"
+versions.photoView = "1.2.6"
+versions.crashreport = "latest.release"
+versions.autosize = "1.1.2"
+versions.circleimageview = "3.0.0"
+versions.dagger2 = "2.19"
+
+def deps = [:]
+
+//support
+def support = [:]
+support.annotations = "com.android.support:support-annotations:$versions.support"
+support.app_compat = "com.android.support:appcompat-v7:$versions.support"
+support.recyclerview = "com.android.support:recyclerview-v7:$versions.support"
+support.cardview = "com.android.support:cardview-v7:$versions.support"
+support.design = "com.android.support:design:$versions.support"
+support.v4 = "com.android.support:support-v4:$versions.support"
+support.core_utils = "com.android.support:support-core-utils:$versions.support"
+support.constraint = "com.android.support.constraint:constraint-layout:$versions.constraint"
+deps.support = support
+
+//network --->
+def okhttp = [:]
+okhttp.okhttp3 = "com.squareup.okhttp3:okhttp:$versions.okhttp"
+okhttp.okhttp3_logging_interceptor = "com.squareup.okhttp3:logging-interceptor:$versions.okhttp"
+deps.okhttp = okhttp
+
+def glide = [:]
+glide.glide3 = "com.github.bumptech.glide:glide:$versions.glide"
+deps.glide = glide
+
+deps.okhttputils = "com.zhy:okhttputils:$versions.okhttputils"
+//network <---
+
+//view --->
+deps.autolayout = "com.zhy:autolayout:$versions.autolayout"
+deps.photoView = "com.github.chrisbanes:PhotoView:$versions.photoView"
+
+def butterknife = [:]
+butterknife.runtime = "com.jakewharton:butterknife:$versions.butterknife"
+butterknife.compiler = "com.jakewharton:butterknife-compiler:$versions.butterknife"
+deps.butterknife = butterknife
+
+deps.androidsvg = "com.caverock:androidsvg:$versions.androidsvg"
+deps.autosize = "me.jessyan:autosize:$versions.autosize"
+deps.circleimageview = "de.hdodenhof:circleimageview:$versions.circleimageview"
+//view <---
+
+//rx1 --->
+deps.rxandroid = "io.reactivex:rxandroid:1.2.1"
+//rx1 <---
+
+//rx2 --->
+deps.rxandroid2 = "io.reactivex.rxjava2:rxandroid:2.1.0"
+//rx2 <---
+
+//tools --->
+def arouter = [:]
+arouter.runtime = "com.alibaba:arouter-api:$versions.arouter_version"
+arouter.compiler = "com.alibaba:arouter-compiler:$versions.arouter_processor_version"
+deps.arouter = arouter
+
+def lombok = [:]
+lombok.annotation = "javax.annotation:javax.annotation-api:$versions.annotation_api"
+lombok.core = "org.projectlombok:lombok:$versions.lombok"
+deps.lombok = lombok
+
+def jiguang = [:]
+jiguang.jpush = "cn.jiguang.sdk:jpush:$versions.jpush"
+jiguang.jcore = "cn.jiguang.sdk:jcore:$versions.jcore"
+deps.jiguang = jiguang
+
+deps.logutils = "com.apkfuns.logutils:library:$versions.logutils_version"
+deps.dom4j = "dom4j:dom4j:$versions.dom4j"
+deps.crashreport = "com.tencent.bugly:crashreport:$versions.crashreport"
+deps.multidex = "com.android.support:multidex:$versions.multidex"
+deps.fastjson = "com.alibaba:fastjson:$versions.fastjson"
+deps.gson = "com.google.code.gson:gson:$versions.gson"
+//tools <---
+
+//test --->
+deps.junit = "junit:junit:$versions.junit"
+//test <---
+
+//dagger2 --->
+def dagger2 = [:]
+dagger2.dagger2 = "com.google.dagger:dagger:$versions.dagger2"
+dagger2.compiler = "com.google.dagger:dagger-compiler:$versions.dagger2"
+deps.dagger2 = dagger2
+//dagger2 <---
+
+deps.android_gradle_plugin = "com.android.tools.build:gradle:$versions.android_gradle_plugin"
+
+ext.deps = deps
+
+def addRepos(RepositoryHandler handler) {
+    handler.google()
+    handler.jcenter()
+    handler.maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+    handler.maven { url 'https://oss.jfrog.org/libs-snapshot' }
+    handler.maven { url 'https://jitpack.io' }
+    handler.maven { url "https://dl.bintray.com/tencentqcloudterminal/maven" }
+    handler.mavenCentral()
+
+}
+ext.addRepos = this.&addRepos

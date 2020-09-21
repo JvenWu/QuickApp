@@ -1,0 +1,68 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion android_ver.compileSdkVersion
+
+
+    defaultConfig {
+        applicationId "com.example.quickapp"
+        minSdkVersion android_ver.minSdkVersion
+        targetSdkVersion android_ver.targetSdkVersion
+        versionCode android_ver.versionCode
+        versionName android_ver.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [moduleName: project.getName()]
+                includeCompileClasspath true
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+//使用aar时必须要设置的
+repositories {
+    flatDir {
+        dirs '../ThirdLibrarys/lib_deps/libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    implementation rootProject.ext.deps.arouter.runtime
+    implementation 'androidx.appcompat:appcompat:1.0.2'
+    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
+
+    //view
+    annotationProcessor(rootProject.ext.deps2["butterknife-compiler"]) {
+        exclude module: 'support-annotations'
+    }
+    
+    //tools
+    annotationProcessor deps.lombok.core
+    annotationProcessor deps.arouter.compiler
+    annotationProcessor deps2["dagger2-compiler"]
+
+    //test
+    debugImplementation rootProject.ext.deps2["canary-debug"]
+    releaseImplementation rootProject.ext.deps2["canary-release"]
+    testImplementation rootProject.ext.deps2["canary-release"]
+}

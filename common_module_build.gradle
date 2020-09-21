@@ -1,0 +1,135 @@
+if (isBuildModule.toBoolean()) {
+    apply plugin: 'com.android.application'
+} else {
+    apply plugin: 'com.android.library'
+}
+//apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'kotlin-android'
+
+android {
+    signingConfigs {
+        kt {
+            storeFile file(KEY_APTH)
+            storePassword KEY_PASS
+            keyAlias ALIAS_NAME
+            keyPassword ALIAS_PASS
+        }
+    }
+
+    compileSdkVersion android_ver["compileSdkVersion"]
+    buildToolsVersion rootProject.ext.android_ver["buildToolsVersion"]
+    // Android 6.0不再支持 Apache HTTP client， 建议使用 HttpURLConnection 代替。
+    // 如果还想要继续使用 Apache HTTP client 的，请在build.gradle中添加如下配置
+    useLibrary 'org.apache.http.legacy'
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.android_ver["minSdkVersion"]
+        targetSdkVersion rootProject.ext.android_ver["targetSdkVersion"]
+        versionCode rootProject.ext.android_ver["versionCode"]
+        versionName rootProject.ext.android_ver["versionName"]
+        testInstrumentationRunner rootProject.ext.deps["androidJUnitRunner"]
+
+        //ARouter
+        javaCompileOptions {
+            annotationProcessorOptions {
+                includeCompileClasspath true
+                arguments = [moduleName: project.getName()]
+            }
+        }
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField "boolean", "LOG_DEBUG", "true"
+            buildConfigField "boolean", "USE_CANARY", "true"
+            buildConfigField "boolean", "IS_BUILD_MODULE", "${isBuildModule}"
+            zipAlignEnabled false
+            shrinkResources false
+            minifyEnabled false
+            debuggable true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            //签名
+            signingConfig signingConfigs.kt
+            // 动态增加strings.xml中的buildTypes = debug
+            resValue "string", "buildTypes", "debug"
+        }
+
+        release {
+            //buildConfig增加日志标识，用于代码中控制显示Log
+            buildConfigField "boolean", "LOG_DEBUG", "false"
+            //buildConfig增加leakcanary标识，用于代码中控制使用leakcanary
+            buildConfigField "boolean", "USE_CANARY", "false"
+            //buildConfig增加isBuildModule标识
+            buildConfigField "boolean", "IS_BUILD_MODULE", "${isBuildModule}"
+            //是否zip对齐
+            zipAlignEnabled true
+            if (isBuildModule.toBoolean()) {
+                //缩减resource文件
+                shrinkResources true
+            }
+            //Proguard
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            //签名
+            signingConfig signingConfigs.kt
+            // 动态增加strings.xml中的buildTypes = release
+            resValue "string", "buildTypes", "release"
+        }
+    }
+
+    sourceSets {
+        main {
+//            jni.srcDirs = [] //disable jni
+//            jniLibs.srcDirs = ['libs'] //change jniLibs -> libs
+            if (isBuildModule.toBoolean()) {
+                manifest.srcFile 'src/main/debug/AndroidManifest.xml'
+            } else {
+                manifest.srcFile 'src/main/AndroidManifest.xml'
+                //集成开发模式下排除debug文件夹中的所有Java文件
+                java {
+                    exclude 'debug/**'
+                }
+            }
+        }
+    }
+
+    lintOptions {
+        disable 'InvalidPackage'
+        disable "ResourceType"
+        abortOnError false
+    }
+
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+dependencies {
+    if (isBuildModule.toBoolean()) {
+        //view
+        annotationProcessor(deps.butterknife.compiler) {
+            exclude module: 'support-annotations'
+        }
+
+        //tools
+        annotationProcessor deps.lombok.core
+        annotationProcessor deps.arouter.compiler
+        annotationProcessor deps.dagger2.compiler
+
+        //test
+        debugImplementation deps2["canary-debug"]
+        releaseImplementation deps2["canary-release"]
+        testImplementation deps2["canary-release"]
+    } else {
+        compileOnly rootProject.ext.deps.butterknife.compiler
+
+        compileOnly rootProject.ext.deps.lombok.core
+        compileOnly rootProject.ext.deps.arouter.compiler
+        compileOnly rootProject.ext.deps.dagger2.compiler
+
+        compileOnly rootProject.ext.deps2["canary-debug"]
+        compileOnly rootProject.ext.deps2["canary-release"]
+    }
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+}

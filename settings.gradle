@@ -1,0 +1,4 @@
+rootProject.name='QuickApp'
+include ':app',
+        'module_sample'
+include ':ThirdLibrarys:lib_deps'

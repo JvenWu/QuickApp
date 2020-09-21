@@ -1,0 +1,82 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion android_ver.compileSdkVersion
+    buildToolsVersion android_ver.buildToolsVersion
+
+
+    defaultConfig {
+        minSdkVersion android_ver.minSdkVersion
+        targetSdkVersion android_ver.targetSdkVersion
+        versionCode 1000
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+}
+
+//使用aar时必须要设置的
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Support libraries
+    api deps.support.app_compat
+    api deps.support.recyclerview
+    api deps.support.constraint
+
+    testImplementation deps.junit
+    androidTestImplementation deps2["junit-ext"]
+    androidTestImplementation deps2["espresso-core"]
+
+    api deps.multidex
+    // autolayout
+    api deps.autolayout
+    api deps.autosize
+    //OkHttp
+    api deps.okhttp.okhttp3
+    // glide
+    api deps.glide.glide3
+    // Gson
+    api deps.gson
+    api deps.fastjson
+
+    // svg
+    api deps.androidsvg
+    // photoview
+    api deps.photoView
+    api 'com.nineoldandroids:library:2.4.0'
+    api "me.leolin:ShortcutBadger:1.1.22@aar"
+
+    //JPush
+//    api deps.jiguang.jpush
+//    api deps.jiguang.jcore
+    // bugly
+    api deps.crashreport
+    // lombok
+    api deps.lombok.annotation
+    api deps.lombok.core
+    annotationProcessor deps.lombok.core
+    // router
+    api deps.arouter.runtime
+    // logutils
+    api deps.logutils
+    api 'com.apkfuns.log2file:log2file:1.3.0'
+    // butterknife
+    api deps.butterknife.runtime
+    api deps.dom4j
+}
